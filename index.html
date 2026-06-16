@@ -715,35 +715,12 @@ async function iniciarKYC() {
 }
 
 function buildPrompt(m) {
-  const checkDescs = {
-    tributario:'Estado tributario (deudas, multas, mora, situación en registro tributario)',
-    legal:'Situación legal y societaria (demandas, juicios, quiebras, estado en registro mercantil)',
-    aml:'Listas OFAC SDN, ONU, UE, GAFI/FATF, Interpol y listas nacionales AML',
-    pep:'Vinculación a PEP: directores, socios o representantes que sean funcionarios públicos',
-    reputacional:'Prensa adversa, noticias negativas, escándalos, corrupción o fraude',
-    ocde:'Cumplimiento OCDE, GAFI, reguladores sectoriales del país'
-  };
-  const uboBlock = m.ubos.length ? '\nBeneficiarios finales:\n' + m.ubos.map(u=>`  - ${u.nombre} (${u.participacion}, ${u.nacionalidad})`).join('\n') : '';
-  const checks = m.checks.map(c=>`- ${CHECK_LABELS[c]}: ${checkDescs[c]}`).join('\n');
-  return `Eres experto en compliance AML/KYC para América Latina y España. Realiza una verificación KYC usando búsqueda web para obtener información actualizada.
-
-EMPRESA:
-- Razón social: ${m.razonSocial}
-- País: ${m.country}
-- ${m.idLabel}: ${m.idFiscal || 'No proporcionado'}
-- Sector: ${m.sector || 'No especificado'}
-${m.nombreComercial ? `- Nombre comercial: ${m.nombreComercial}` : ''}
-${m.sitioWeb ? `- Sitio web: ${m.sitioWeb}` : ''}${uboBlock}
-${m.obs ? `- Observaciones: ${m.obs}` : ''}
-
-VERIFICACIONES:
-${checks}
-
-Consulta fuentes oficiales (SAT/MX, SII/CL, DIAN/CO, SUNAT/PE, SRI/EC, AEAT/ES) y listas internacionales (OFAC, ONU, UE, GAFI).
-
-Responde ÚNICAMENTE con JSON válido sin texto adicional ni backticks:
-{"overall":"ok|warn|risk","overall_summary":"Resumen 1-2 oraciones","checks":{${m.checks.map(c=>`"${c}":{"status":"ok|warn|risk|no_data","summary":"Análisis 2-3 oraciones","sources":["fuente1"]}`).join(',')}}}`;
+  const uboBlock = m.ubos.length ? ' UBOs: ' + m.ubos.map(u=>u.nombre+' '+u.participacion).join(', ')+'.' : '';
+  const checks = m.checks.join(', ');
+  const json = '{"overall":"ok|warn|risk","overall_summary":"1 sentence","checks":{'+m.checks.map(c=>'"'+c+'":{"status":"ok|warn|risk|no_data","summary":"2 sentences","sources":["source"]}').join(',')+'}}';
+  return 'KYC analyst. Search web for current info. Company: "'+m.razonSocial+'", '+m.country+(m.idFiscal?', '+m.idLabel+': '+m.idFiscal:'')+(m.sector?', sector: '+m.sector:'')+'.'+uboBlock+(m.obs?' Notes: '+m.obs:'')+' Checks: '+checks+'. Verify tax status, legal/court issues, OFAC/UN/EU/FATF sanctions lists, PEP links, adverse press, regulatory compliance. Reply ONLY valid JSON: '+json;
 }
+
 
 function abrirModalPDF() { document.getElementById('modal-pdf').classList.add('open'); }
 function cerrarModal()   { document.getElementById('modal-pdf').classList.remove('open'); }
