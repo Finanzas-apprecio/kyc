@@ -9,40 +9,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" />
   <style>
-    /* ── CONFIG ── Cambia aquí la API key o déjala vacía para usar el campo del UI */
-    :root {
-      --api-key: "";
-    }
-
-    /* ── RESET & BASE ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #F7F7F5;
-      color: #212121;
-      min-height: 100vh;
-    }
+    html, body { height: 100%; }
+    body { font-family: 'Inter', sans-serif; background: #F7F7F5; color: #212121; }
 
-    /* ── LAYOUT ── */
+    /* ── LAYOUT: flexbox simple, sin fixed ── */
     .app-shell {
-      display: grid;
-      grid-template-columns: 260px 1fr;
+      display: flex;
       min-height: 100vh;
     }
-
-    /* ── SIDEBAR ── */
     .sidebar {
+      width: 260px;
+      min-width: 260px;
       background: #1A1A1A;
-      padding: 0;
       display: flex;
       flex-direction: column;
-      position: fixed;
-      top: 0; left: 0;
+      position: sticky;
+      top: 0;
       height: 100vh;
-      width: 260px;
-      z-index: 10;
+      align-self: flex-start;
     }
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 32px 40px;
+    }
+    .main-inner {
+      max-width: 860px;
+    }
+
+    /* ── SIDEBAR INTERNALS ── */
     .sidebar-brand {
       padding: 24px 20px 20px;
       border-bottom: 0.5px solid rgba(255,255,255,0.08);
@@ -96,11 +92,7 @@
       padding: 16px 20px;
       border-top: 0.5px solid rgba(255,255,255,0.08);
     }
-    .api-key-field {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+    .api-key-field { display: flex; flex-direction: column; gap: 5px; }
     .api-key-field label {
       font-size: 10px;
       color: rgba(255,255,255,0.3);
@@ -121,90 +113,36 @@
     .api-key-field input:focus { border-color: #FA345E; }
     .api-key-field input::placeholder { color: rgba(255,255,255,0.2); }
 
-    /* ── MAIN CONTENT ── */
-    .main {
-      margin-left: 260px;
-      padding: 32px 40px;
-      width: calc(100% - 260px);
-      min-height: 100vh;
-    }
-    .main-inner {
-      max-width: 860px;
-    }
-
     /* ── PAGE HEADER ── */
-    .page-header {
-      margin-bottom: 28px;
-    }
-    .page-header h1 {
-      font-size: 22px;
-      font-weight: 600;
-      color: #212121;
-      margin-bottom: 4px;
-    }
-    .page-header p {
-      font-size: 14px;
-      color: #757575;
-    }
-    .country-chips {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .chip {
-      font-size: 11px;
-      background: #fff;
-      border: 0.5px solid #E0E0E0;
-      border-radius: 20px;
-      padding: 3px 10px;
-      color: #555;
-    }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 22px; font-weight: 600; color: #212121; margin-bottom: 4px; }
+    .page-header p { font-size: 14px; color: #757575; }
+    .country-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .chip { font-size: 11px; background: #fff; border: 0.5px solid #E0E0E0; border-radius: 20px; padding: 3px 10px; color: #555; }
 
-    /* ── FORM CARD ── */
-    .card {
-      background: #fff;
-      border: 0.5px solid #E8E8E6;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 16px;
-    }
+    /* ── CARD ── */
+    .card { background: #fff; border: 0.5px solid #E8E8E6; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
     .card-section-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: #9E9E9E;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 11px; font-weight: 600; color: #9E9E9E;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
     }
     .card-section-title i { font-size: 14px; color: #FA345E; }
 
+    /* ── FORM ── */
     .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group label {
-      font-size: 11px;
-      font-weight: 500;
-      color: #757575;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-size: 11px; font-weight: 500; color: #757575;
+      text-transform: uppercase; letter-spacing: 0.05em;
     }
     .form-group input,
     .form-group select,
     .form-group textarea {
-      border: 0.5px solid #E0E0E0;
-      border-radius: 8px;
-      padding: 9px 12px;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      color: #212121;
-      background: #fff;
-      outline: none;
-      transition: border-color 0.15s;
-      width: 100%;
+      border: 0.5px solid #E0E0E0; border-radius: 8px;
+      padding: 9px 12px; font-size: 14px; font-family: 'Inter', sans-serif;
+      color: #212121; background: #fff; outline: none;
+      transition: border-color 0.15s; width: 100%;
     }
     .form-group input:focus,
     .form-group select:focus,
@@ -212,83 +150,42 @@
     .form-group textarea { resize: vertical; min-height: 64px; }
 
     /* ── UBO ── */
-    .ubo-header {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 32px;
-      gap: 10px;
-      margin-bottom: 4px;
-      padding: 0 2px;
-    }
-    .ubo-header span { font-size: 11px; color: #9E9E9E; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
-    .ubo-row {
+    .ubo-header, .ubo-row {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 32px;
       gap: 10px;
       margin-bottom: 8px;
       align-items: center;
     }
+    .ubo-header span { font-size: 11px; color: #9E9E9E; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
     .ubo-row input {
-      border: 0.5px solid #E0E0E0;
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 13px;
-      font-family: 'Inter', sans-serif;
-      color: #212121;
-      outline: none;
-      transition: border-color 0.15s;
-      width: 100%;
+      border: 0.5px solid #E0E0E0; border-radius: 8px;
+      padding: 8px 10px; font-size: 13px; font-family: 'Inter', sans-serif;
+      color: #212121; outline: none; transition: border-color 0.15s; width: 100%;
     }
     .ubo-row input:focus { border-color: #FA345E; }
     .btn-remove-ubo {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #BDBDBD;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px;
-      border-radius: 6px;
-      transition: color 0.15s, background 0.15s;
+      background: none; border: none; cursor: pointer; color: #BDBDBD;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
+      padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s;
     }
     .btn-remove-ubo:hover { color: #FA345E; background: #FFF0F3; }
     .btn-add-ubo {
-      background: none;
-      border: 0.5px dashed #E0E0E0;
-      border-radius: 8px;
-      color: #9E9E9E;
-      font-size: 13px;
-      font-family: 'Inter', sans-serif;
-      padding: 8px 16px;
-      cursor: pointer;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      background: none; border: 0.5px dashed #E0E0E0; border-radius: 8px;
+      color: #9E9E9E; font-size: 13px; font-family: 'Inter', sans-serif;
+      padding: 8px 16px; cursor: pointer; width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: border-color 0.15s, color 0.15s;
     }
     .btn-add-ubo:hover { border-color: #FA345E; color: #FA345E; }
 
-    /* ── CHECKS GRID ── */
-    .checks-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 8px;
-    }
+    /* ── CHECKS ── */
+    .checks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .check-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border: 0.5px solid #E0E0E0;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      color: #555;
-      transition: border-color 0.15s, background 0.15s;
-      user-select: none;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; border: 0.5px solid #E0E0E0; border-radius: 8px;
+      cursor: pointer; font-size: 13px; color: #555;
+      transition: border-color 0.15s, background 0.15s; user-select: none;
     }
     .check-item:hover { border-color: #FA345E; }
     .check-item.active { border-color: #FA345E; background: #FFF5F7; color: #212121; }
@@ -299,78 +196,33 @@
 
     /* ── BUTTONS ── */
     .btn-primary {
-      background: #FA345E;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 11px 24px;
-      font-size: 14px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      transition: background 0.15s;
+      background: #FA345E; color: #fff; border: none; border-radius: 8px;
+      padding: 11px 24px; font-size: 14px; font-weight: 500; font-family: 'Inter', sans-serif;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 8px; width: 100%; transition: background 0.15s;
     }
     .btn-primary:hover { background: #D42A4E; }
-    .btn-primary:disabled {
-      background: #F5F5F5;
-      color: #BDBDBD;
-      cursor: not-allowed;
-      border: 0.5px solid #E0E0E0;
-    }
+    .btn-primary:disabled { background: #F5F5F5; color: #BDBDBD; cursor: not-allowed; border: 0.5px solid #E0E0E0; }
     .btn-secondary {
-      background: #fff;
-      color: #555;
-      border: 0.5px solid #E0E0E0;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 7px;
+      background: #fff; color: #555; border: 0.5px solid #E0E0E0; border-radius: 8px;
+      padding: 10px 20px; font-size: 13px; font-weight: 500; font-family: 'Inter', sans-serif;
+      cursor: pointer; display: flex; align-items: center; gap: 7px;
       transition: background 0.15s, border-color 0.15s;
     }
     .btn-secondary:hover { background: #F7F7F5; border-color: #BDBDBD; }
     .btn-pdf {
-      background: #FA345E;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      transition: background 0.15s;
+      background: #FA345E; color: #fff; border: none; border-radius: 8px;
+      padding: 10px 20px; font-size: 13px; font-weight: 500; font-family: 'Inter', sans-serif;
+      cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background 0.15s;
     }
     .btn-pdf:hover { background: #D42A4E; }
-    .btn-pdf:disabled {
-      background: #F5F5F5;
-      color: #BDBDBD;
-      cursor: not-allowed;
-      border: 0.5px solid #E0E0E0;
-    }
+    .btn-pdf:disabled { background: #F5F5F5; color: #BDBDBD; cursor: not-allowed; border: 0.5px solid #E0E0E0; }
     .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
 
-    /* ── RESULTS ── */
+    /* ── SUMMARY BANNER ── */
     .summary-banner {
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 16px;
-      border: 0.5px solid;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
+      border-radius: 12px; padding: 16px 20px; margin-bottom: 16px;
+      border: 0.5px solid; display: flex; align-items: flex-start; gap: 12px;
     }
     .summary-ok    { background: #F0FAF0; border-color: #A8D5A8; }
     .summary-warn  { background: #FFFBF0; border-color: #FAC775; }
@@ -381,7 +233,6 @@
     .summary-warn .summary-icon  { color: #E65100; }
     .summary-risk .summary-icon  { color: #C62828; }
     .summary-loading .summary-icon { color: #9E9E9E; }
-    .summary-text-block {}
     .summary-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
     .summary-ok .summary-title    { color: #1B5E20; }
     .summary-warn .summary-title  { color: #BF360C; }
@@ -393,17 +244,12 @@
     .summary-risk .summary-sub  { color: #D32F2F; }
     .summary-loading .summary-sub { color: #9E9E9E; }
 
+    /* ── RESULT CARDS ── */
     .result-card { background: #fff; border: 0.5px solid #E8E8E6; border-radius: 12px; padding: 18px 20px; margin-bottom: 10px; }
     .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .result-title { font-size: 14px; font-weight: 600; color: #212121; display: flex; align-items: center; gap: 8px; }
     .result-title i { font-size: 16px; color: #FA345E; }
-    .badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.02em;
-    }
+    .badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.02em; white-space: nowrap; }
     .badge-ok         { background: #E8F5E9; color: #2E7D32; }
     .badge-warn       { background: #FFF3E0; color: #E65100; }
     .badge-risk       { background: #FFEBEE; color: #C62828; }
@@ -411,54 +257,44 @@
     .badge-processing { background: #E8F0FE; color: #1565C0; }
     .result-body { font-size: 13px; color: #555; line-height: 1.65; }
     .source-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
-    .source-tag {
-      font-size: 11px;
-      background: #F7F7F5;
-      border: 0.5px solid #E0E0E0;
-      border-radius: 4px;
-      color: #757575;
-      padding: 2px 8px;
-    }
+    .source-tag { font-size: 11px; background: #F7F7F5; border: 0.5px solid #E0E0E0; border-radius: 4px; color: #757575; padding: 2px 8px; }
     .loading-bar { height: 2px; background: #F0F0F0; border-radius: 2px; overflow: hidden; margin: 8px 0; }
     .loading-bar-inner { height: 100%; background: #FA345E; border-radius: 2px; animation: loadbar 1.6s ease-in-out infinite; }
     @keyframes loadbar { 0%{width:0;margin-left:0} 50%{width:55%;margin-left:20%} 100%{width:0;margin-left:100%} }
 
-    /* ── PDF MODAL ── */
+    /* ── MODAL ── */
     .modal-backdrop {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 100;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100;
       display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
-    .modal {
-      background: #fff;
-      border-radius: 14px;
-      padding: 28px 32px;
-      width: 440px;
-      max-width: 90vw;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-    }
+    .modal { background: #fff; border-radius: 14px; padding: 28px 32px; width: 440px; max-width: 90vw; }
     .modal h2 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
     .modal p { font-size: 13px; color: #757575; margin-bottom: 20px; }
     .modal-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
     .modal-fields label { font-size: 11px; font-weight: 500; color: #9E9E9E; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 5px; }
     .modal-fields input, .modal-fields select {
-      border: 0.5px solid #E0E0E0; border-radius: 8px;
-      padding: 9px 12px; font-size: 14px; font-family: 'Inter', sans-serif;
-      color: #212121; width: 100%; outline: none; transition: border-color 0.15s;
+      border: 0.5px solid #E0E0E0; border-radius: 8px; padding: 9px 12px;
+      font-size: 14px; font-family: 'Inter', sans-serif; color: #212121; width: 100%; outline: none;
     }
     .modal-fields input:focus, .modal-fields select:focus { border-color: #FA345E; }
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #9E9E9E;
+    /* ── HISTORY ── */
+    .history-item {
+      background: #fff; border: 0.5px solid #E8E8E6; border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; transition: border-color 0.15s;
     }
+    .history-item:hover { border-color: #FA345E; }
+    .history-meta { display: flex; flex-direction: column; gap: 2px; }
+    .history-name { font-size: 14px; font-weight: 500; color: #212121; }
+    .history-sub { font-size: 12px; color: #9E9E9E; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: #9E9E9E; }
     .empty-state i { font-size: 40px; margin-bottom: 12px; display: block; }
     .empty-state h3 { font-size: 15px; font-weight: 500; color: #616161; margin-bottom: 6px; }
     .empty-state p { font-size: 13px; }
@@ -466,127 +302,43 @@
     /* ── TOAST ── */
     .toast {
       position: fixed; bottom: 24px; right: 24px;
-      background: #1A1A1A; color: #fff;
-      padding: 12px 18px; border-radius: 10px;
+      background: #1A1A1A; color: #fff; padding: 12px 18px; border-radius: 10px;
       font-size: 13px; display: flex; align-items: center; gap: 8px;
-      transform: translateY(60px); opacity: 0;
-      transition: transform 0.25s, opacity 0.25s;
-      z-index: 200;
+      transform: translateY(60px); opacity: 0; transition: transform 0.25s, opacity 0.25s; z-index: 200;
     }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { background: #1B5E20; }
     .toast.error { background: #C62828; }
 
-    /* ── HISTORY ── */
-    .history-item {
-      background: #fff;
-      border: 0.5px solid #E8E8E6;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-    .history-item:hover { border-color: #FA345E; }
-    .history-meta { display: flex; flex-direction: column; gap: 2px; }
-    .history-name { font-size: 14px; font-weight: 500; color: #212121; }
-    .history-sub { font-size: 12px; color: #9E9E9E; }
-    .history-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      /* El shell pasa a una sola columna */
-      .app-shell { grid-template-columns: 1fr; }
-
-      /* Sidebar → topbar horizontal fijo */
+      .app-shell { flex-direction: column; }
       .sidebar {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        align-items: center;
+        width: 100%; min-width: 0; height: auto;
+        position: sticky; top: 0;
+        flex-direction: row; align-items: center;
         padding: 0 16px;
-        gap: 0;
-        z-index: 20;
-        border-bottom: 0.5px solid rgba(255,255,255,0.08);
       }
-      .sidebar-brand {
-        padding: 12px 0;
-        border-bottom: none;
-        border-right: 0.5px solid rgba(255,255,255,0.08);
-        margin-right: 12px;
-        flex-shrink: 0;
-      }
+      .sidebar-brand { padding: 12px 12px 12px 0; border-bottom: none; border-right: 0.5px solid rgba(255,255,255,0.1); margin-right: 8px; flex-shrink: 0; }
       .sidebar-brand p { display: none; }
       .brand-pill { margin-bottom: 0; }
-
-      /* Nav horizontal */
-      .sidebar-nav {
-        display: flex;
-        flex-direction: row;
-        padding: 0;
-        flex: 1;
-        gap: 2px;
-      }
+      .sidebar-nav { display: flex; flex-direction: row; padding: 0; gap: 2px; }
       .nav-label { display: none; }
-      .nav-item {
-        padding: 8px 10px;
-        font-size: 12px;
-        white-space: nowrap;
-      }
-
-      /* API key compacta al final */
-      .sidebar-footer {
-        border-top: none;
-        border-left: 0.5px solid rgba(255,255,255,0.08);
-        padding: 10px 0 10px 12px;
-        flex-shrink: 0;
-        max-width: 140px;
-      }
+      .nav-item { font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+      .sidebar-footer { border-top: none; border-left: 0.5px solid rgba(255,255,255,0.1); padding: 10px 0 10px 12px; flex-shrink: 0; max-width: 150px; }
       .api-key-field label { display: none; }
       .api-key-field input { font-size: 11px; padding: 6px 8px; }
-
-      /* Main: empuja hacia abajo del topbar */
-      .main {
-        margin-left: 0;
-        margin-top: 56px;
-        padding: 20px 16px;
-        width: 100%;
-      }
-      .main-inner { max-width: 100%; }
-
-      /* Formulario en columna */
-      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
-      .ubo-row { grid-template-columns: 1fr 72px 72px 32px; }
-
-      /* Chips en fila con scroll si hace falta */
-      .country-chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
-      .chip { white-space: nowrap; flex-shrink: 0; }
-
-      /* Verificaciones: 2 columnas en mobile */
+      .main { padding: 20px 16px; }
+      .form-grid-2 { grid-template-columns: 1fr; }
       .checks-grid { grid-template-columns: 1fr 1fr; }
-
-      /* Cards menos padding */
-      .card { padding: 16px; }
-      .page-header h1 { font-size: 18px; }
-    }
-
-    @media (max-width: 420px) {
-      .nav-item span { display: none; }
-      .checks-grid { grid-template-columns: 1fr; }
-      .ubo-row { grid-template-columns: 1fr 60px 32px; }
-      .ubo-row input:nth-child(3) { display: none; }
+      .country-chips { flex-wrap: nowrap; overflow-x: auto; }
+      .chip { white-space: nowrap; flex-shrink: 0; }
     }
   </style>
 </head>
 <body>
 
 <div class="app-shell">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="brand-pill">apprecio</div>
@@ -595,10 +347,10 @@
     <nav class="sidebar-nav">
       <div class="nav-label">Menú</div>
       <a class="nav-item active" onclick="showView('form')" href="#">
-        <i class="ti ti-shield-check"></i> <span>Nueva verificación</span>
+        <i class="ti ti-shield-check"></i> Nueva verificación
       </a>
       <a class="nav-item" onclick="showView('history')" href="#">
-        <i class="ti ti-history"></i> <span>Historial</span>
+        <i class="ti ti-history"></i> Historial
       </a>
     </nav>
     <div class="sidebar-footer">
@@ -609,7 +361,6 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
   <div class="main-inner">
 
@@ -628,7 +379,6 @@
         </div>
       </div>
 
-      <!-- FORM -->
       <div id="form-section">
         <div class="card">
           <div class="card-section-title"><i class="ti ti-building"></i> Datos de la empresa</div>
@@ -671,17 +421,14 @@
           </div>
           <div class="form-group">
             <label>Observaciones adicionales</label>
-            <textarea id="obs" placeholder="Fuente de fondos esperada, contexto del cliente, información relevante..."></textarea>
+            <textarea id="obs" placeholder="Fuente de fondos esperada, contexto del cliente..."></textarea>
           </div>
         </div>
 
         <div class="card">
           <div class="card-section-title"><i class="ti ti-users"></i> Beneficiarios finales (UBO)</div>
           <div id="ubo-header" class="ubo-header" style="display:none">
-            <span>Nombre completo</span>
-            <span>% participación</span>
-            <span>Nacionalidad</span>
-            <span></span>
+            <span>Nombre completo</span><span>% participación</span><span>Nacionalidad</span><span></span>
           </div>
           <div id="ubo-list"></div>
           <button class="btn-add-ubo" onclick="addUBO()">
@@ -692,14 +439,13 @@
         <div class="card">
           <div class="card-section-title"><i class="ti ti-checklist"></i> Verificaciones</div>
           <div class="checks-grid">
-            <label class="check-item active"><input type="checkbox" checked value="tributario"> <i class="ti ti-building-bank" style="font-size:14px;color:#FA345E"></i> Estado tributario</label>
-            <label class="check-item active"><input type="checkbox" checked value="legal"> <i class="ti ti-scale" style="font-size:14px;color:#FA345E"></i> Situación legal</label>
-            <label class="check-item active"><input type="checkbox" checked value="aml"> <i class="ti ti-shield-exclamation" style="font-size:14px;color:#FA345E"></i> Listas AML / Sanciones</label>
-            <label class="check-item active"><input type="checkbox" checked value="pep"> <i class="ti ti-user-shield" style="font-size:14px;color:#FA345E"></i> PEP</label>
-            <label class="check-item active"><input type="checkbox" checked value="reputacional"> <i class="ti ti-news" style="font-size:14px;color:#FA345E"></i> Prensa adversa</label>
-            <label class="check-item active"><input type="checkbox" checked value="ocde"> <i class="ti ti-world" style="font-size:14px;color:#FA345E"></i> OCDE / FATF</label>
+            <label class="check-item active"><input type="checkbox" checked value="tributario"> <i class="ti ti-building-bank" style="font-size:14px;color:#FA345E;flex-shrink:0"></i> Estado tributario</label>
+            <label class="check-item active"><input type="checkbox" checked value="legal"> <i class="ti ti-scale" style="font-size:14px;color:#FA345E;flex-shrink:0"></i> Situación legal</label>
+            <label class="check-item active"><input type="checkbox" checked value="aml"> <i class="ti ti-shield-exclamation" style="font-size:14px;color:#FA345E;flex-shrink:0"></i> Listas AML / Sanciones</label>
+            <label class="check-item active"><input type="checkbox" checked value="pep"> <i class="ti ti-user-shield" style="font-size:14px;color:#FA345E;flex-shrink:0"></i> PEP</label>
+            <label class="check-item active"><input type="checkbox" checked value="reputacional"> <i class="ti ti-news" style="font-size:14px;color:#FA345E;flex-shrink:0"></i> Prensa adversa</label>
+            <label class="check-item active"><input type="checkbox" checked value="ocde"> <i class="ti ti-world" style="font-size:14px;color:#FA345E;flex-shrink:0"></i> OCDE / FATF</label>
           </div>
-
           <hr class="divider" />
           <button class="btn-primary" id="btn-verificar" onclick="iniciarKYC()">
             <i class="ti ti-shield-check"></i> Iniciar verificación KYC
@@ -707,7 +453,6 @@
         </div>
       </div>
 
-      <!-- RESULTS -->
       <div id="results-section" style="display:none">
         <div id="summary-banner"></div>
         <div id="results-container"></div>
@@ -781,33 +526,25 @@
 </div>
 
 <script>
-/* ── CONSTANTES ── */
-const ID_LABELS   = { MX:'RFC', CL:'RUT', CO:'NIT', PE:'RUC', EC:'RUC', ES:'NIF / CIF' };
+const ID_LABELS     = { MX:'RFC', CL:'RUT', CO:'NIT', PE:'RUC', EC:'RUC', ES:'NIF / CIF' };
 const COUNTRY_NAMES = { MX:'México', CL:'Chile', CO:'Colombia', PE:'Perú', EC:'Ecuador', ES:'España' };
 const CHECK_LABELS  = { tributario:'Estado tributario', legal:'Situación legal', aml:'Listas AML / Sanciones', pep:'PEP', reputacional:'Prensa adversa', ocde:'OCDE / FATF' };
 const CHECK_ICONS   = { tributario:'ti-building-bank', legal:'ti-scale', aml:'ti-shield-exclamation', pep:'ti-user-shield', reputacional:'ti-news', ocde:'ti-world' };
 const STATUS_MAP = {
-  ok:      { badge:'badge-ok',      text:'Sin alertas',  summary_cls:'summary-ok',   summary_icon:'ti-circle-check', summary_title:'Sin alertas relevantes' },
-  warn:    { badge:'badge-warn',    text:'Revisar',      summary_cls:'summary-warn',  summary_icon:'ti-alert-triangle', summary_title:'Se requiere revisión manual' },
-  risk:    { badge:'badge-risk',    text:'Riesgo',       summary_cls:'summary-risk',  summary_icon:'ti-shield-x', summary_title:'Riesgo elevado detectado' },
-  no_data: { badge:'badge-no_data', text:'Sin datos',    summary_cls:'summary-warn',  summary_icon:'ti-question-mark', summary_title:'Información insuficiente' },
+  ok:      { badge:'badge-ok',      text:'Sin alertas',  summary_cls:'summary-ok',      summary_icon:'ti-circle-check',   summary_title:'Sin alertas relevantes' },
+  warn:    { badge:'badge-warn',    text:'Revisar',      summary_cls:'summary-warn',    summary_icon:'ti-alert-triangle', summary_title:'Se requiere revisión manual' },
+  risk:    { badge:'badge-risk',    text:'Riesgo',       summary_cls:'summary-risk',    summary_icon:'ti-shield-x',       summary_title:'Riesgo elevado detectado' },
+  no_data: { badge:'badge-no_data', text:'Sin datos',    summary_cls:'summary-warn',    summary_icon:'ti-question-mark',  summary_title:'Información insuficiente' },
 };
 
-/* ── ESTADO ── */
-let kycResults = null;
-let kycMeta    = null;
-let history    = [];
+let kycResults = null, kycMeta = null, history = [];
 
-/* ── HELPERS ── */
-function getApiKey() {
-  return document.getElementById('api-key-input').value.trim();
-}
+function getApiKey() { return document.getElementById('api-key-input').value.trim(); }
 
 function showToast(msg, type='') {
   const el = document.getElementById('toast');
-  const msgEl = document.getElementById('toast-msg');
   el.className = 'toast ' + type;
-  msgEl.textContent = msg;
+  document.getElementById('toast-msg').textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3200);
 }
@@ -816,32 +553,28 @@ function showView(view) {
   document.getElementById('view-form').style.display    = view === 'form'    ? '' : 'none';
   document.getElementById('view-history').style.display = view === 'history' ? '' : 'none';
   document.querySelectorAll('.nav-item').forEach((el, i) => {
-    el.classList.toggle('active', (view === 'form' && i === 0) || (view === 'history' && i === 1));
+    el.classList.toggle('active', (view==='form'&&i===0)||(view==='history'&&i===1));
   });
   if (view === 'history') renderHistory();
 }
 
 function updateIdLabel() {
-  const p = document.getElementById('pais').value;
-  document.getElementById('id-label').textContent = ID_LABELS[p] || 'Número fiscal';
+  document.getElementById('id-label').textContent = ID_LABELS[document.getElementById('pais').value] || 'Número fiscal';
 }
 
-/* ── UBO ── */
 function addUBO() {
   document.getElementById('ubo-header').style.display = 'grid';
-  const list = document.getElementById('ubo-list');
   const row = document.createElement('div');
   row.className = 'ubo-row';
   row.innerHTML = `
     <input type="text" placeholder="Ej: Juan Pérez García" />
     <input type="text" placeholder="Ej: 25%" />
     <input type="text" placeholder="Ej: Mexicana" />
-    <button class="btn-remove-ubo" onclick="removeUBO(this)" aria-label="Eliminar"><i class="ti ti-x"></i></button>`;
-  list.appendChild(row);
+    <button class="btn-remove-ubo" onclick="this.closest('.ubo-row').remove(); checkUBOHeader()" aria-label="Eliminar"><i class="ti ti-x"></i></button>`;
+  document.getElementById('ubo-list').appendChild(row);
 }
 
-function removeUBO(btn) {
-  btn.closest('.ubo-row').remove();
+function checkUBOHeader() {
   if (!document.querySelectorAll('#ubo-list .ubo-row').length)
     document.getElementById('ubo-header').style.display = 'none';
 }
@@ -853,7 +586,6 @@ function getUBOs() {
   }).filter(u => u.nombre);
 }
 
-/* ── CHECKS ── */
 document.querySelectorAll('.check-item').forEach(item => {
   item.addEventListener('change', () => item.classList.toggle('active', item.querySelector('input').checked));
 });
@@ -862,10 +594,9 @@ function getCheckedItems() {
   return [...document.querySelectorAll('.checks-grid input[type=checkbox]:checked')].map(cb => cb.value);
 }
 
-/* ── KYC PRINCIPAL ── */
 async function iniciarKYC() {
   const apiKey = getApiKey();
-  if (!apiKey) { showToast('Ingresa tu API key de Anthropic en el panel izquierdo.', 'error'); return; }
+  if (!apiKey) { showToast('Ingresa tu API key en el panel izquierdo.', 'error'); return; }
 
   const pais          = document.getElementById('pais').value;
   const idFiscal      = document.getElementById('id-fiscal').value.trim();
@@ -884,21 +615,19 @@ async function iniciarKYC() {
               idLabel: ID_LABELS[pais], country: COUNTRY_NAMES[pais], fecha: new Date().toISOString() };
 
   document.getElementById('btn-verificar').disabled = true;
-  document.getElementById('form-section').style.display   = 'none';
+  document.getElementById('form-section').style.display    = 'none';
   document.getElementById('results-section').style.display = '';
   document.getElementById('btn-pdf').disabled = true;
 
-  /* Banner cargando */
   document.getElementById('summary-banner').innerHTML = `
     <div class="summary-banner summary-loading">
       <i class="ti ti-loader-2 summary-icon"></i>
-      <div class="summary-text-block">
+      <div>
         <div class="summary-title">Verificando ${razonSocial}</div>
         <div class="summary-sub">Consultando fuentes en ${COUNTRY_NAMES[pais]}...</div>
       </div>
     </div>`;
 
-  /* Cards de verificación */
   const container = document.getElementById('results-container');
   container.innerHTML = '';
   const checkDivs = {};
@@ -916,7 +645,6 @@ async function iniciarKYC() {
     checkDivs[check] = div;
   });
 
-  /* Llamada API */
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -946,38 +674,32 @@ async function iniciarKYC() {
 
     if (parsed && parsed.checks) {
       kycResults = parsed;
-
       checks.forEach(check => {
         const r = parsed.checks[check];
         if (!r) return;
-        const div = checkDivs[check];
         const s = STATUS_MAP[r.status] || STATUS_MAP['no_data'];
+        const div = checkDivs[check];
         div.querySelector('.badge').className = `badge ${s.badge}`;
         div.querySelector('.badge').textContent = s.text;
         div.querySelector('.loading-bar').remove();
         const srcHtml = r.sources && r.sources.length
-          ? `<div class="source-tags">${r.sources.map(s => `<span class="source-tag">${s}</span>`).join('')}</div>` : '';
+          ? `<div class="source-tags">${r.sources.map(s=>`<span class="source-tag">${s}</span>`).join('')}</div>` : '';
         div.querySelector(`#body-${check}`).innerHTML = `<p>${r.summary}</p>${srcHtml}`;
       });
-
       const overall = parsed.overall || 'warn';
       const s = STATUS_MAP[overall] || STATUS_MAP['warn'];
       document.getElementById('summary-banner').innerHTML = `
         <div class="summary-banner ${s.summary_cls}">
           <i class="ti ${s.summary_icon} summary-icon"></i>
-          <div class="summary-text-block">
+          <div>
             <div class="summary-title">${s.summary_title} — ${razonSocial}</div>
             <div class="summary-sub">${parsed.overall_summary || ''}</div>
           </div>
         </div>`;
-
       document.getElementById('btn-pdf').disabled = false;
-
-      /* Guardar en historial */
       history.unshift({ meta: kycMeta, results: kycResults, overall, ts: new Date() });
-
     } else {
-      showToast('La respuesta no tuvo el formato esperado.', 'error');
+      showToast('Respuesta inesperada del modelo.', 'error');
     }
   } catch (err) {
     showToast('Error: ' + err.message, 'error');
@@ -988,24 +710,20 @@ async function iniciarKYC() {
       checkDivs[check].querySelector(`#body-${check}`).textContent = err.message;
     });
   }
-
   document.getElementById('btn-verificar').disabled = false;
 }
 
-/* ── PROMPT ── */
 function buildPrompt(m) {
   const checkDescs = {
-    tributario: 'Estado tributario (deudas, multas, mora, situación en el registro tributario del país)',
-    legal:      'Situación legal y societaria (demandas, juicios, quiebras, estado en registro mercantil)',
-    aml:        'Listas de sanciones: OFAC SDN, ONU, UE, GAFI/FATF, Interpol y listas nacionales AML',
-    pep:        'Vinculación a PEP: directores, socios o representantes que sean funcionarios públicos',
-    reputacional: 'Prensa adversa, noticias negativas, escándalos, corrupción o fraude',
-    ocde:       'Cumplimiento OCDE, GAFI, reguladores sectoriales del país'
+    tributario:'Estado tributario (deudas, multas, mora, situación en registro tributario)',
+    legal:'Situación legal y societaria (demandas, juicios, quiebras, estado en registro mercantil)',
+    aml:'Listas OFAC SDN, ONU, UE, GAFI/FATF, Interpol y listas nacionales AML',
+    pep:'Vinculación a PEP: directores, socios o representantes que sean funcionarios públicos',
+    reputacional:'Prensa adversa, noticias negativas, escándalos, corrupción o fraude',
+    ocde:'Cumplimiento OCDE, GAFI, reguladores sectoriales del país'
   };
-  const uboBlock = m.ubos.length
-    ? `\nBeneficiarios finales declarados:\n${m.ubos.map(u => `  - ${u.nombre} (${u.participacion}, ${u.nacionalidad})`).join('\n')}` : '';
-  const checks = m.checks.map(c => `- ${CHECK_LABELS[c]}: ${checkDescs[c]}`).join('\n');
-
+  const uboBlock = m.ubos.length ? '\nBeneficiarios finales:\n' + m.ubos.map(u=>`  - ${u.nombre} (${u.participacion}, ${u.nacionalidad})`).join('\n') : '';
+  const checks = m.checks.map(c=>`- ${CHECK_LABELS[c]}: ${checkDescs[c]}`).join('\n');
   return `Eres experto en compliance AML/KYC para América Latina y España. Realiza una verificación KYC usando búsqueda web para obtener información actualizada.
 
 EMPRESA:
@@ -1017,68 +735,44 @@ ${m.nombreComercial ? `- Nombre comercial: ${m.nombreComercial}` : ''}
 ${m.sitioWeb ? `- Sitio web: ${m.sitioWeb}` : ''}${uboBlock}
 ${m.obs ? `- Observaciones: ${m.obs}` : ''}
 
-VERIFICACIONES SOLICITADAS:
+VERIFICACIONES:
 ${checks}
 
-Busca información actualizada. Consulta fuentes oficiales del país (SAT en MX, SII en CL, DIAN en CO, SUNAT en PE, SRI en EC, AEAT en ES) y listas internacionales (OFAC, ONU, UE, GAFI).
+Consulta fuentes oficiales (SAT/MX, SII/CL, DIAN/CO, SUNAT/PE, SRI/EC, AEAT/ES) y listas internacionales (OFAC, ONU, UE, GAFI).
 
-Responde ÚNICAMENTE con JSON válido sin texto adicional ni backticks markdown:
-{"overall":"ok|warn|risk","overall_summary":"Resumen ejecutivo 1-2 oraciones","checks":{${m.checks.map(c => `"${c}":{"status":"ok|warn|risk|no_data","summary":"Análisis 2-3 oraciones con hallazgos específicos","sources":["fuente1","fuente2"]}`).join(',')}}}`;
+Responde ÚNICAMENTE con JSON válido sin texto adicional ni backticks:
+{"overall":"ok|warn|risk","overall_summary":"Resumen 1-2 oraciones","checks":{${m.checks.map(c=>`"${c}":{"status":"ok|warn|risk|no_data","summary":"Análisis 2-3 oraciones","sources":["fuente1"]}`).join(',')}}}`;
 }
 
-/* ── MODAL PDF ── */
-function abrirModalPDF() {
-  document.getElementById('modal-pdf').classList.add('open');
-}
-function cerrarModal() {
-  document.getElementById('modal-pdf').classList.remove('open');
-}
-document.getElementById('modal-pdf').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-pdf')) cerrarModal();
-});
+function abrirModalPDF() { document.getElementById('modal-pdf').classList.add('open'); }
+function cerrarModal()   { document.getElementById('modal-pdf').classList.remove('open'); }
+document.getElementById('modal-pdf').addEventListener('click', e => { if (e.target === document.getElementById('modal-pdf')) cerrarModal(); });
 
 async function generarPDF() {
   const analista = document.getElementById('pdf-analista').value.trim() || 'Analista Apprecio';
   const decision = document.getElementById('pdf-decision').value;
   const notas    = document.getElementById('pdf-notas').value.trim();
   const apiKey   = getApiKey();
-
   cerrarModal();
   showToast('Generando reporte PDF...');
-
   const payload = JSON.stringify({ meta: kycMeta, results: kycResults, analista, decision, notas });
-
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: `GENERAR_KYC_PDF::${payload}` }]
-      })
+      headers: { 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:300, messages:[{ role:'user', content:`GENERAR_KYC_PDF::${payload}` }] })
     });
     const data = await res.json();
-    const txt = data.content?.map(b => b.text||'').join('') || '';
-    showToast(txt.substring(0, 80) || 'PDF en proceso', 'success');
-  } catch (err) {
-    showToast('Error generando PDF: ' + err.message, 'error');
-  }
+    showToast(data.content?.[0]?.text?.substring(0,80) || 'PDF en proceso', 'success');
+  } catch(err) { showToast('Error generando PDF: ' + err.message, 'error'); }
 }
 
-/* ── HISTORIAL ── */
 function renderHistory() {
   const el = document.getElementById('history-list');
   if (!history.length) {
     el.innerHTML = `<div class="empty-state"><i class="ti ti-history"></i><h3>Sin verificaciones aún</h3><p>Las verificaciones realizadas aparecerán aquí.</p></div>`;
     return;
   }
-  const decisionLabel = { pendiente:'Pendiente', aprobado:'Aprobado', rechazado:'Rechazado', aprobado_condiciones:'Aprobado c/ cond.' };
   el.innerHTML = history.map((h, i) => {
     const s = STATUS_MAP[h.overall] || STATUS_MAP['warn'];
     return `<div class="history-item" onclick="verHistorial(${i})">
@@ -1086,7 +780,7 @@ function renderHistory() {
         <div class="history-name">${h.meta.razonSocial}</div>
         <div class="history-sub">${h.meta.country} · ${h.ts.toLocaleString('es-CL')}</div>
       </div>
-      <span class="history-badge ${s.badge}">${s.text}</span>
+      <span class="badge ${s.badge}">${s.text}</span>
     </div>`;
   }).join('');
 }
@@ -1098,25 +792,20 @@ function verHistorial(idx) {
   document.getElementById('form-section').style.display    = 'none';
   document.getElementById('results-section').style.display = '';
   document.getElementById('btn-pdf').disabled = false;
-
   const s = STATUS_MAP[h.overall] || STATUS_MAP['warn'];
   document.getElementById('summary-banner').innerHTML = `
     <div class="summary-banner ${s.summary_cls}">
       <i class="ti ${s.summary_icon} summary-icon"></i>
-      <div class="summary-text-block">
-        <div class="summary-title">${s.summary_title} — ${h.meta.razonSocial}</div>
-        <div class="summary-sub">${h.results.overall_summary || ''}</div>
-      </div>
+      <div><div class="summary-title">${s.summary_title} — ${h.meta.razonSocial}</div>
+      <div class="summary-sub">${h.results.overall_summary || ''}</div></div>
     </div>`;
-
   const container = document.getElementById('results-container');
   container.innerHTML = '';
   h.meta.checks.forEach(check => {
     const r = h.results.checks[check];
     if (!r) return;
     const st = STATUS_MAP[r.status] || STATUS_MAP['no_data'];
-    const srcHtml = r.sources && r.sources.length
-      ? `<div class="source-tags">${r.sources.map(s => `<span class="source-tag">${s}</span>`).join('')}</div>` : '';
+    const srcHtml = r.sources && r.sources.length ? `<div class="source-tags">${r.sources.map(s=>`<span class="source-tag">${s}</span>`).join('')}</div>` : '';
     const div = document.createElement('div');
     div.className = 'result-card';
     div.innerHTML = `
@@ -1129,7 +818,6 @@ function verHistorial(idx) {
   });
 }
 
-/* ── RESET ── */
 function resetForm() {
   document.getElementById('form-section').style.display    = '';
   document.getElementById('results-section').style.display = 'none';
