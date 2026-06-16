@@ -596,7 +596,8 @@ function getCheckedItems() {
 
 async function iniciarKYC() {
   const apiKey = getApiKey();
-  if (!apiKey) { showToast('Ingresa tu API key en el panel izquierdo.', 'error'); return; }
+  const WEBHOOK = 'https://n8n.openip.cl/webhook/kyc-verificacion';
+  if (!WEBHOOK && !apiKey) { showToast('Ingresa tu API key en el panel izquierdo.', 'error'); return; }
 
   const pais          = document.getElementById('pais').value;
   const idFiscal      = document.getElementById('id-fiscal').value.trim();
@@ -645,18 +646,12 @@ async function iniciarKYC() {
     checkDivs[check] = div;
   });
 
-  // ── Modo: n8n webhook (recomendado) o directo a Anthropic
-  // Si N8N_WEBHOOK_URL está definido, enruta por n8n (API key segura en el servidor)
-  // Si no, llama directo a Anthropic con la key del campo UI
-  const N8N_WEBHOOK_URL = 'https://n8n.openip.cl/webhook/kyc-verificacion'; // <-- Pega aquí tu URL de webhook de n8n después de importar el workflow
-                               // Ej: 'https://tu-n8n.com/webhook/kyc-verificacion'
-
   try {
     let parsed = null;
 
-    if (N8N_WEBHOOK_URL) {
+    if (WEBHOOK) {
       // Modo n8n: envía el prompt, n8n maneja la API key
-      const res = await fetch(N8N_WEBHOOK_URL, {
+      const res = await fetch(WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tipo: 'analisis', prompt: buildPrompt(kycMeta) })
