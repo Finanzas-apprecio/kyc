@@ -494,11 +494,87 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
+      /* El shell pasa a una sola columna */
       .app-shell { grid-template-columns: 1fr; }
-      .sidebar { position: relative; width: 100%; height: auto; }
-      .main { margin-left: 0; padding: 20px 16px; }
+
+      /* Sidebar → topbar horizontal fijo */
+      .sidebar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 16px;
+        gap: 0;
+        z-index: 20;
+        border-bottom: 0.5px solid rgba(255,255,255,0.08);
+      }
+      .sidebar-brand {
+        padding: 12px 0;
+        border-bottom: none;
+        border-right: 0.5px solid rgba(255,255,255,0.08);
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+      .sidebar-brand p { display: none; }
+      .brand-pill { margin-bottom: 0; }
+
+      /* Nav horizontal */
+      .sidebar-nav {
+        display: flex;
+        flex-direction: row;
+        padding: 0;
+        flex: 1;
+        gap: 2px;
+      }
+      .nav-label { display: none; }
+      .nav-item {
+        padding: 8px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      /* API key compacta al final */
+      .sidebar-footer {
+        border-top: none;
+        border-left: 0.5px solid rgba(255,255,255,0.08);
+        padding: 10px 0 10px 12px;
+        flex-shrink: 0;
+        max-width: 140px;
+      }
+      .api-key-field label { display: none; }
+      .api-key-field input { font-size: 11px; padding: 6px 8px; }
+
+      /* Main: empuja hacia abajo del topbar */
+      .main {
+        margin-left: 0;
+        margin-top: 56px;
+        padding: 20px 16px;
+        max-width: 100%;
+      }
+
+      /* Formulario en columna */
       .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
-      .ubo-row { grid-template-columns: 1fr 80px 80px 32px; }
+      .ubo-row { grid-template-columns: 1fr 72px 72px 32px; }
+
+      /* Chips en fila con scroll si hace falta */
+      .country-chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+      .chip { white-space: nowrap; flex-shrink: 0; }
+
+      /* Verificaciones: 2 columnas en mobile */
+      .checks-grid { grid-template-columns: 1fr 1fr; }
+
+      /* Cards menos padding */
+      .card { padding: 16px; }
+      .page-header h1 { font-size: 18px; }
+    }
+
+    @media (max-width: 420px) {
+      .nav-item span { display: none; }
+      .checks-grid { grid-template-columns: 1fr; }
+      .ubo-row { grid-template-columns: 1fr 60px 32px; }
+      .ubo-row input:nth-child(3) { display: none; }
     }
   </style>
 </head>
@@ -514,10 +590,10 @@
     <nav class="sidebar-nav">
       <div class="nav-label">Menú</div>
       <a class="nav-item active" onclick="showView('form')" href="#">
-        <i class="ti ti-shield-check"></i> Nueva verificación
+        <i class="ti ti-shield-check"></i> <span>Nueva verificación</span>
       </a>
       <a class="nav-item" onclick="showView('history')" href="#">
-        <i class="ti ti-history"></i> Historial
+        <i class="ti ti-history"></i> <span>Historial</span>
       </a>
     </nav>
     <div class="sidebar-footer">
