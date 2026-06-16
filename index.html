@@ -645,32 +645,38 @@ async function iniciarKYC() {
     checkDivs[check] = div;
   });
 
+  // ── Modo: n8n webhook (recomendado) o directo a Anthropic
+  // Si N8N_WEBHOOK_URL está definido, enruta por n8n (API key segura en el servidor)
+  // Si no, llama directo a Anthropic con la key del campo UI
+  const N8N_WEBHOOK_URL = ''; // <-- Pega aquí tu URL de webhook de n8n después de importar el workflow
+                               // Ej: 'https://tu-n8n.com/webhook/kyc-verificacion'
+
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: buildPrompt(kycMeta) }]
-      })
-    });
+    let parsed = null;
 
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-
-    const fullText = data.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
-    let parsed;
-    try {
-      const m = fullText.match(/```json\s*([\s\S]*?)```/) || fullText.match(/(\{[\s\S]*\})/);
-      parsed = JSON.parse(m ? m[1] : fullText);
-    } catch { parsed = null; }
+    if (N8N_WEBHOOK_URL) {
+      // Modo n8n: envía el prompt, n8n maneja la API key
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo: 'analisis', prompt: buildPrompt(kycMeta) })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      parsed = data.kycResults || data;
+    } else {
+      // Modo directo: usa la API key del campo UI (para desarrollo)
+      if (!apiKey) { showToast('Ingresa tu API key o configura el webhook de n8n.', 'error'); resetForm(); return; }
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:2000, tools:[{type:'web_search_20250305',name:'web_search'}], messages:[{role:'user',content:buildPrompt(kycMeta)}] })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      const fullText = data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+      try { const m = fullText.match(/```json\s*([\s\S]*?)```/)||fullText.match(/(\{[\s\S]*\})/); parsed = JSON.parse(m?m[1]:fullText); } catch { parsed=null; }
+    }
 
     if (parsed && parsed.checks) {
       kycResults = parsed;
@@ -752,19 +758,31 @@ async function generarPDF() {
   const analista = document.getElementById('pdf-analista').value.trim() || 'Analista Apprecio';
   const decision = document.getElementById('pdf-decision').value;
   const notas    = document.getElementById('pdf-notas').value.trim();
-  const apiKey   = getApiKey();
+  const analista_email = ''; // Opcional: email del analista para recibir notificación
   cerrarModal();
   showToast('Generando reporte PDF...');
-  const payload = JSON.stringify({ meta: kycMeta, results: kycResults, analista, decision, notas });
+
+  const N8N_WEBHOOK_URL = ''; // <-- misma URL del webhook de n8n
+
+  if (!N8N_WEBHOOK_URL) {
+    showToast('Configura N8N_WEBHOOK_URL en el HTML para generar PDFs.', 'error');
+    return;
+  }
+
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-      body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:300, messages:[{ role:'user', content:`GENERAR_KYC_PDF::${payload}` }] })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo: 'generar_pdf', meta: kycMeta, results: kycResults, analista, analista_email, decision, notas })
     });
     const data = await res.json();
-    showToast(data.content?.[0]?.text?.substring(0,80) || 'PDF en proceso', 'success');
-  } catch(err) { showToast('Error generando PDF: ' + err.message, 'error'); }
+    if (data.ok) {
+      showToast('PDF generado y enviado a Drive', 'success');
+      if (data.drive_link) window.open(data.drive_link, '_blank');
+    } else {
+      showToast('Error al generar PDF: ' + (data.error || 'desconocido'), 'error');
+    }
+  } catch(err) { showToast('Error: ' + err.message, 'error'); }
 }
 
 function renderHistory() {
