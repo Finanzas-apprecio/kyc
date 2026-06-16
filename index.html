@@ -648,7 +648,7 @@ async function iniciarKYC() {
   // ── Modo: n8n webhook (recomendado) o directo a Anthropic
   // Si N8N_WEBHOOK_URL está definido, enruta por n8n (API key segura en el servidor)
   // Si no, llama directo a Anthropic con la key del campo UI
-  const N8N_WEBHOOK_URL = ''; // <-- Pega aquí tu URL de webhook de n8n después de importar el workflow
+  const N8N_WEBHOOK_URL = 'https://n8n.openip.cl/webhook-test/kyc-verificacion'; // <-- Pega aquí tu URL de webhook de n8n después de importar el workflow
                                // Ej: 'https://tu-n8n.com/webhook/kyc-verificacion'
 
   try {
