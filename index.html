@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KYC · Apprecio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" />
+  <style>
+    /* ── CONFIG ── Cambia aquí la API key o déjala vacía para usar el campo del UI */
+    :root {
+      --api-key: "";
+    }
+
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #F7F7F5;
+      color: #212121;
+      min-height: 100vh;
+    }
+
+    /* ── LAYOUT ── */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: #1A1A1A;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      width: 260px;
+      z-index: 10;
+    }
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    }
+    .brand-pill {
+      display: inline-block;
+      background: #FA345E;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .sidebar-brand p {
+      color: rgba(255,255,255,0.45);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .sidebar-nav {
+      padding: 16px 12px;
+      flex: 1;
+    }
+    .nav-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 2px;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+    .nav-item.active { background: rgba(250,52,94,0.15); color: #FA345E; }
+    .nav-item i { font-size: 16px; }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 0.5px solid rgba(255,255,255,0.08);
+    }
+    .api-key-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .api-key-field label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .api-key-field input {
+      background: rgba(255,255,255,0.07);
+      border: 0.5px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      color: rgba(255,255,255,0.7);
+      font-size: 12px;
+      font-family: 'Inter', monospace;
+      padding: 7px 10px;
+      width: 100%;
+      outline: none;
+    }
+    .api-key-field input:focus { border-color: #FA345E; }
+    .api-key-field input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      margin-left: 260px;
+      padding: 32px 40px;
+      max-width: 900px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      margin-bottom: 28px;
+    }
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #212121;
+      margin-bottom: 4px;
+    }
+    .page-header p {
+      font-size: 14px;
+      color: #757575;
+    }
+    .country-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .chip {
+      font-size: 11px;
+      background: #fff;
+      border: 0.5px solid #E0E0E0;
+      border-radius: 20px;
+      padding: 3px 10px;
+      color: #555;
+    }
+
+    /* ── FORM CARD ── */
+    .card {
+      background: #fff;
+      border: 0.5px solid #E8E8E6;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .card-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9E9E9E;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-section-title i { font-size: 14px; color: #FA345E; }
+
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #757575;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      border: 0.5px solid #E0E0E0;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: #212121;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: #FA345E; box-shadow: 0 0 0 3px rgba(250,52,94,0.07); }
+    .form-group textarea { resize: vertical; min-height: 64px; }
+
+    /* ── UBO ── */
+    .ubo-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 32px;
+      gap: 10px;
+      margin-bottom: 4px;
+      padding: 0 2px;
+    }
+    .ubo-header span { font-size: 11px; color: #9E9E9E; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+    .ubo-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 32px;
+      gap: 10px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .ubo-row input {
+      border: 0.5px solid #E0E0E0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: #212121;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .ubo-row input:focus { border-color: #FA345E; }
+    .btn-remove-ubo {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #BDBDBD;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-remove-ubo:hover { color: #FA345E; background: #FFF0F3; }
+    .btn-add-ubo {
+      background: none;
+      border: 0.5px dashed #E0E0E0;
+      border-radius: 8px;
+      color: #9E9E9E;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      padding: 8px 16px;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-add-ubo:hover { border-color: #FA345E; color: #FA345E; }
+
+    /* ── CHECKS GRID ── */
+    .checks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 8px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 0.5px solid #E0E0E0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #555;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .check-item:hover { border-color: #FA345E; }
+    .check-item.active { border-color: #FA345E; background: #FFF5F7; color: #212121; }
+    .check-item input { accent-color: #FA345E; width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 0.5px solid #F0F0EE; margin: 20px 0; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: #FA345E;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #D42A4E; }
+    .btn-primary:disabled {
+      background: #F5F5F5;
+      color: #BDBDBD;
+      cursor: not-allowed;
+      border: 0.5px solid #E0E0E0;
+    }
+    .btn-secondary {
+      background: #fff;
+      color: #555;
+      border: 0.5px solid #E0E0E0;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-secondary:hover { background: #F7F7F5; border-color: #BDBDBD; }
+    .btn-pdf {
+      background: #FA345E;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.15s;
+    }
+    .btn-pdf:hover { background: #D42A4E; }
+    .btn-pdf:disabled {
+      background: #F5F5F5;
+      color: #BDBDBD;
+      cursor: not-allowed;
+      border: 0.5px solid #E0E0E0;
+    }
+    .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+    /* ── RESULTS ── */
+    .summary-banner {
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      border: 0.5px solid;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .summary-ok    { background: #F0FAF0; border-color: #A8D5A8; }
+    .summary-warn  { background: #FFFBF0; border-color: #FAC775; }
+    .summary-risk  { background: #FFF0F0; border-color: #F7C1C1; }
+    .summary-loading { background: #F5F5F5; border-color: #E0E0E0; }
+    .summary-icon { font-size: 22px; margin-top: 1px; flex-shrink: 0; }
+    .summary-ok .summary-icon    { color: #2E7D32; }
+    .summary-warn .summary-icon  { color: #E65100; }
+    .summary-risk .summary-icon  { color: #C62828; }
+    .summary-loading .summary-icon { color: #9E9E9E; }
+    .summary-text-block {}
+    .summary-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+    .summary-ok .summary-title    { color: #1B5E20; }
+    .summary-warn .summary-title  { color: #BF360C; }
+    .summary-risk .summary-title  { color: #B71C1C; }
+    .summary-loading .summary-title { color: #616161; }
+    .summary-sub { font-size: 13px; }
+    .summary-ok .summary-sub    { color: #388E3C; }
+    .summary-warn .summary-sub  { color: #E64A19; }
+    .summary-risk .summary-sub  { color: #D32F2F; }
+    .summary-loading .summary-sub { color: #9E9E9E; }
+
+    .result-card { background: #fff; border: 0.5px solid #E8E8E6; border-radius: 12px; padding: 18px 20px; margin-bottom: 10px; }
+    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .result-title { font-size: 14px; font-weight: 600; color: #212121; display: flex; align-items: center; gap: 8px; }
+    .result-title i { font-size: 16px; color: #FA345E; }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+    .badge-ok         { background: #E8F5E9; color: #2E7D32; }
+    .badge-warn       { background: #FFF3E0; color: #E65100; }
+    .badge-risk       { background: #FFEBEE; color: #C62828; }
+    .badge-no_data    { background: #F5F5F5; color: #757575; }
+    .badge-processing { background: #E8F0FE; color: #1565C0; }
+    .result-body { font-size: 13px; color: #555; line-height: 1.65; }
+    .source-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .source-tag {
+      font-size: 11px;
+      background: #F7F7F5;
+      border: 0.5px solid #E0E0E0;
+      border-radius: 4px;
+      color: #757575;
+      padding: 2px 8px;
+    }
+    .loading-bar { height: 2px; background: #F0F0F0; border-radius: 2px; overflow: hidden; margin: 8px 0; }
+    .loading-bar-inner { height: 100%; background: #FA345E; border-radius: 2px; animation: loadbar 1.6s ease-in-out infinite; }
+    @keyframes loadbar { 0%{width:0;margin-left:0} 50%{width:55%;margin-left:20%} 100%{width:0;margin-left:100%} }
+
+    /* ── PDF MODAL ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 32px;
+      width: 440px;
+      max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    .modal h2 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+    .modal p { font-size: 13px; color: #757575; margin-bottom: 20px; }
+    .modal-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .modal-fields label { font-size: 11px; font-weight: 500; color: #9E9E9E; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 5px; }
+    .modal-fields input, .modal-fields select {
+      border: 0.5px solid #E0E0E0; border-radius: 8px;
+      padding: 9px 12px; font-size: 14px; font-family: 'Inter', sans-serif;
+      color: #212121; width: 100%; outline: none; transition: border-color 0.15s;
+    }
+    .modal-fields input:focus, .modal-fields select:focus { border-color: #FA345E; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9E9E9E;
+    }
+    .empty-state i { font-size: 40px; margin-bottom: 12px; display: block; }
+    .empty-state h3 { font-size: 15px; font-weight: 500; color: #616161; margin-bottom: 6px; }
+    .empty-state p { font-size: 13px; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1A1A1A; color: #fff;
+      padding: 12px 18px; border-radius: 10px;
+      font-size: 13px; display: flex; align-items: center; gap: 8px;
+      transform: translateY(60px); opacity: 0;
+      transition: transform 0.25s, opacity 0.25s;
+      z-index: 200;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: #1B5E20; }
+    .toast.error { background: #C62828; }
+
+    /* ── HISTORY ── */
+    .history-item {
+      background: #fff;
+      border: 0.5px solid #E8E8E6;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .history-item:hover { border-color: #FA345E; }
+    .history-meta { display: flex; flex-direction: column; gap: 2px; }
+    .history-name { font-size: 14px; font-weight: 500; color: #212121; }
+    .history-sub { font-size: 12px; color: #9E9E9E; }
+    .history-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: relative; width: 100%; height: auto; }
+      .main { margin-left: 0; padding: 20px 16px; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+      .ubo-row { grid-template-columns: 1fr 80px 80px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-pill">apprecio</div>
+      <p>Compliance · KYC</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Menú</div>
+      <a class="nav-item active" onclick="showView('form')" href="#">
+        <i class="ti ti-shield-check"></i> Nueva verificación
+      </a>
+      <a class="nav-item" onclick="showView('history')" href="#">
+        <i class="ti ti-history"></i> Historial
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="api-key-field">
+        <label>API Key Anthropic</label>
+        <input type="password" id="api-key-input" placeholder="sk-ant-..." />
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- VISTA: FORMULARIO -->
+    <div id="view-form">
+      <div class="page-header">
+        <h1>Verificación KYC</h1>
+        <p>Verifica antecedentes legales, tributarios y AML de empresas clientes.</p>
+        <div class="country-chips">
+          <span class="chip">🇲🇽 México</span>
+          <span class="chip">🇨🇱 Chile</span>
+          <span class="chip">🇨🇴 Colombia</span>
+          <span class="chip">🇵🇪 Perú</span>
+          <span class="chip">🇪🇨 Ecuador</span>
+          <span class="chip">🇪🇸 España</span>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div id="form-section">
+        <div class="card">
+          <div class="card-section-title"><i class="ti ti-building"></i> Datos de la empresa</div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>País</label>
+              <select id="pais" onchange="updateIdLabel()">
+                <option value="MX">🇲🇽 México</option>
+                <option value="CL">🇨🇱 Chile</option>
+                <option value="CO">🇨🇴 Colombia</option>
+                <option value="PE">🇵🇪 Perú</option>
+                <option value="EC">🇪🇨 Ecuador</option>
+                <option value="ES">🇪🇸 España</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label id="id-label">RFC</label>
+              <input type="text" id="id-fiscal" placeholder="Ej: ABC123456XYZ" />
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Razón social *</label>
+              <input type="text" id="razon-social" placeholder="Nombre legal de la empresa" />
+            </div>
+            <div class="form-group">
+              <label>Sector / Industria</label>
+              <input type="text" id="sector" placeholder="Ej: Tecnología, Retail..." />
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Nombre comercial</label>
+              <input type="text" id="nombre-comercial" placeholder="Si difiere de la razón social" />
+            </div>
+            <div class="form-group">
+              <label>Sitio web</label>
+              <input type="text" id="sitio-web" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Observaciones adicionales</label>
+            <textarea id="obs" placeholder="Fuente de fondos esperada, contexto del cliente, información relevante..."></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-section-title"><i class="ti ti-users"></i> Beneficiarios finales (UBO)</div>
+          <div id="ubo-header" class="ubo-header" style="display:none">
+            <span>Nombre completo</span>
+            <span>% participación</span>
+            <span>Nacionalidad</span>
+            <span></span>
+          </div>
+          <div id="ubo-list"></div>
+          <button class="btn-add-ubo" onclick="addUBO()">
+            <i class="ti ti-plus"></i> Agregar beneficiario final
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-section-title"><i class="ti ti-checklist"></i> Verificaciones</div>
+          <div class="checks-grid">
+            <label class="check-item active"><input type="checkbox" checked value="tributario"> <i class="ti ti-building-bank" style="font-size:14px;color:#FA345E"></i> Estado tributario</label>
+            <label class="check-item active"><input type="checkbox" checked value="legal"> <i class="ti ti-scale" style="font-size:14px;color:#FA345E"></i> Situación legal</label>
+            <label class="check-item active"><input type="checkbox" checked value="aml"> <i class="ti ti-shield-exclamation" style="font-size:14px;color:#FA345E"></i> Listas AML / Sanciones</label>
+            <label class="check-item active"><input type="checkbox" checked value="pep"> <i class="ti ti-user-shield" style="font-size:14px;color:#FA345E"></i> PEP</label>
+            <label class="check-item active"><input type="checkbox" checked value="reputacional"> <i class="ti ti-news" style="font-size:14px;color:#FA345E"></i> Prensa adversa</label>
+            <label class="check-item active"><input type="checkbox" checked value="ocde"> <i class="ti ti-world" style="font-size:14px;color:#FA345E"></i> OCDE / FATF</label>
+          </div>
+
+          <hr class="divider" />
+          <button class="btn-primary" id="btn-verificar" onclick="iniciarKYC()">
+            <i class="ti ti-shield-check"></i> Iniciar verificación KYC
+          </button>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="results-section" style="display:none">
+        <div id="summary-banner"></div>
+        <div id="results-container"></div>
+        <div class="actions-row">
+          <button class="btn-pdf" id="btn-pdf" onclick="abrirModalPDF()" disabled>
+            <i class="ti ti-file-type-pdf"></i> Generar reporte PDF
+          </button>
+          <button class="btn-secondary" onclick="resetForm()">
+            <i class="ti ti-refresh"></i> Nueva verificación
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA: HISTORIAL -->
+    <div id="view-history" style="display:none">
+      <div class="page-header">
+        <h1>Historial de verificaciones</h1>
+        <p>Verificaciones realizadas en esta sesión.</p>
+      </div>
+      <div id="history-list">
+        <div class="empty-state">
+          <i class="ti ti-history"></i>
+          <h3>Sin verificaciones aún</h3>
+          <p>Las verificaciones realizadas aparecerán aquí.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL PDF -->
+<div class="modal-backdrop" id="modal-pdf">
+  <div class="modal">
+    <h2>Generar reporte PDF</h2>
+    <p>El reporte se generará con el brand Apprecio e incluirá todos los hallazgos de la verificación.</p>
+    <div class="modal-fields">
+      <div>
+        <label>Analista responsable</label>
+        <input type="text" id="pdf-analista" placeholder="Nombre del analista" />
+      </div>
+      <div>
+        <label>Resultado de la revisión</label>
+        <select id="pdf-decision">
+          <option value="pendiente">Pendiente de revisión</option>
+          <option value="aprobado">Aprobado</option>
+          <option value="rechazado">Rechazado</option>
+          <option value="aprobado_condiciones">Aprobado con condiciones</option>
+        </select>
+      </div>
+      <div>
+        <label>Notas del analista (opcional)</label>
+        <input type="text" id="pdf-notas" placeholder="Observaciones finales..." />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-pdf" onclick="generarPDF()">
+        <i class="ti ti-file-type-pdf"></i> Generar PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="ti ti-check"></i>
+  <span id="toast-msg">Listo</span>
+</div>
+
+<script>
+/* ── CONSTANTES ── */
+const ID_LABELS   = { MX:'RFC', CL:'RUT', CO:'NIT', PE:'RUC', EC:'RUC', ES:'NIF / CIF' };
+const COUNTRY_NAMES = { MX:'México', CL:'Chile', CO:'Colombia', PE:'Perú', EC:'Ecuador', ES:'España' };
+const CHECK_LABELS  = { tributario:'Estado tributario', legal:'Situación legal', aml:'Listas AML / Sanciones', pep:'PEP', reputacional:'Prensa adversa', ocde:'OCDE / FATF' };
+const CHECK_ICONS   = { tributario:'ti-building-bank', legal:'ti-scale', aml:'ti-shield-exclamation', pep:'ti-user-shield', reputacional:'ti-news', ocde:'ti-world' };
+const STATUS_MAP = {
+  ok:      { badge:'badge-ok',      text:'Sin alertas',  summary_cls:'summary-ok',   summary_icon:'ti-circle-check', summary_title:'Sin alertas relevantes' },
+  warn:    { badge:'badge-warn',    text:'Revisar',      summary_cls:'summary-warn',  summary_icon:'ti-alert-triangle', summary_title:'Se requiere revisión manual' },
+  risk:    { badge:'badge-risk',    text:'Riesgo',       summary_cls:'summary-risk',  summary_icon:'ti-shield-x', summary_title:'Riesgo elevado detectado' },
+  no_data: { badge:'badge-no_data', text:'Sin datos',    summary_cls:'summary-warn',  summary_icon:'ti-question-mark', summary_title:'Información insuficiente' },
+};
+
+/* ── ESTADO ── */
+let kycResults = null;
+let kycMeta    = null;
+let history    = [];
+
+/* ── HELPERS ── */
+function getApiKey() {
+  return document.getElementById('api-key-input').value.trim();
+}
+
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  const msgEl = document.getElementById('toast-msg');
+  el.className = 'toast ' + type;
+  msgEl.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+function showView(view) {
+  document.getElementById('view-form').style.display    = view === 'form'    ? '' : 'none';
+  document.getElementById('view-history').style.display = view === 'history' ? '' : 'none';
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', (view === 'form' && i === 0) || (view === 'history' && i === 1));
+  });
+  if (view === 'history') renderHistory();
+}
+
+function updateIdLabel() {
+  const p = document.getElementById('pais').value;
+  document.getElementById('id-label').textContent = ID_LABELS[p] || 'Número fiscal';
+}
+
+/* ── UBO ── */
+function addUBO() {
+  document.getElementById('ubo-header').style.display = 'grid';
+  const list = document.getElementById('ubo-list');
+  const row = document.createElement('div');
+  row.className = 'ubo-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Ej: Juan Pérez García" />
+    <input type="text" placeholder="Ej: 25%" />
+    <input type="text" placeholder="Ej: Mexicana" />
+    <button class="btn-remove-ubo" onclick="removeUBO(this)" aria-label="Eliminar"><i class="ti ti-x"></i></button>`;
+  list.appendChild(row);
+}
+
+function removeUBO(btn) {
+  btn.closest('.ubo-row').remove();
+  if (!document.querySelectorAll('#ubo-list .ubo-row').length)
+    document.getElementById('ubo-header').style.display = 'none';
+}
+
+function getUBOs() {
+  return [...document.querySelectorAll('#ubo-list .ubo-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    return { nombre: inputs[0].value.trim(), participacion: inputs[1].value.trim(), nacionalidad: inputs[2].value.trim() };
+  }).filter(u => u.nombre);
+}
+
+/* ── CHECKS ── */
+document.querySelectorAll('.check-item').forEach(item => {
+  item.addEventListener('change', () => item.classList.toggle('active', item.querySelector('input').checked));
+});
+
+function getCheckedItems() {
+  return [...document.querySelectorAll('.checks-grid input[type=checkbox]:checked')].map(cb => cb.value);
+}
+
+/* ── KYC PRINCIPAL ── */
+async function iniciarKYC() {
+  const apiKey = getApiKey();
+  if (!apiKey) { showToast('Ingresa tu API key de Anthropic en el panel izquierdo.', 'error'); return; }
+
+  const pais          = document.getElementById('pais').value;
+  const idFiscal      = document.getElementById('id-fiscal').value.trim();
+  const razonSocial   = document.getElementById('razon-social').value.trim();
+  const sector        = document.getElementById('sector').value.trim();
+  const nombreComercial = document.getElementById('nombre-comercial').value.trim();
+  const sitioWeb      = document.getElementById('sitio-web').value.trim();
+  const obs           = document.getElementById('obs').value.trim();
+  const checks        = getCheckedItems();
+  const ubos          = getUBOs();
+
+  if (!razonSocial) { showToast('Ingresa la razón social de la empresa.', 'error'); return; }
+  if (!checks.length) { showToast('Selecciona al menos una verificación.', 'error'); return; }
+
+  kycMeta = { pais, idFiscal, razonSocial, sector, nombreComercial, sitioWeb, obs, ubos, checks,
+              idLabel: ID_LABELS[pais], country: COUNTRY_NAMES[pais], fecha: new Date().toISOString() };
+
+  document.getElementById('btn-verificar').disabled = true;
+  document.getElementById('form-section').style.display   = 'none';
+  document.getElementById('results-section').style.display = '';
+  document.getElementById('btn-pdf').disabled = true;
+
+  /* Banner cargando */
+  document.getElementById('summary-banner').innerHTML = `
+    <div class="summary-banner summary-loading">
+      <i class="ti ti-loader-2 summary-icon"></i>
+      <div class="summary-text-block">
+        <div class="summary-title">Verificando ${razonSocial}</div>
+        <div class="summary-sub">Consultando fuentes en ${COUNTRY_NAMES[pais]}...</div>
+      </div>
+    </div>`;
+
+  /* Cards de verificación */
+  const container = document.getElementById('results-container');
+  container.innerHTML = '';
+  const checkDivs = {};
+  checks.forEach(check => {
+    const div = document.createElement('div');
+    div.className = 'result-card';
+    div.innerHTML = `
+      <div class="result-header">
+        <div class="result-title"><i class="ti ${CHECK_ICONS[check]}"></i> ${CHECK_LABELS[check]}</div>
+        <span class="badge badge-processing">Consultando...</span>
+      </div>
+      <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+      <div class="result-body" id="body-${check}">Buscando información...</div>`;
+    container.appendChild(div);
+    checkDivs[check] = div;
+  });
+
+  /* Llamada API */
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: buildPrompt(kycMeta) }]
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const fullText = data.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
+    let parsed;
+    try {
+      const m = fullText.match(/```json\s*([\s\S]*?)```/) || fullText.match(/(\{[\s\S]*\})/);
+      parsed = JSON.parse(m ? m[1] : fullText);
+    } catch { parsed = null; }
+
+    if (parsed && parsed.checks) {
+      kycResults = parsed;
+
+      checks.forEach(check => {
+        const r = parsed.checks[check];
+        if (!r) return;
+        const div = checkDivs[check];
+        const s = STATUS_MAP[r.status] || STATUS_MAP['no_data'];
+        div.querySelector('.badge').className = `badge ${s.badge}`;
+        div.querySelector('.badge').textContent = s.text;
+        div.querySelector('.loading-bar').remove();
+        const srcHtml = r.sources && r.sources.length
+          ? `<div class="source-tags">${r.sources.map(s => `<span class="source-tag">${s}</span>`).join('')}</div>` : '';
+        div.querySelector(`#body-${check}`).innerHTML = `<p>${r.summary}</p>${srcHtml}`;
+      });
+
+      const overall = parsed.overall || 'warn';
+      const s = STATUS_MAP[overall] || STATUS_MAP['warn'];
+      document.getElementById('summary-banner').innerHTML = `
+        <div class="summary-banner ${s.summary_cls}">
+          <i class="ti ${s.summary_icon} summary-icon"></i>
+          <div class="summary-text-block">
+            <div class="summary-title">${s.summary_title} — ${razonSocial}</div>
+            <div class="summary-sub">${parsed.overall_summary || ''}</div>
+          </div>
+        </div>`;
+
+      document.getElementById('btn-pdf').disabled = false;
+
+      /* Guardar en historial */
+      history.unshift({ meta: kycMeta, results: kycResults, overall, ts: new Date() });
+
+    } else {
+      showToast('La respuesta no tuvo el formato esperado.', 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+    checks.forEach(check => {
+      checkDivs[check].querySelector('.badge').className = 'badge badge-warn';
+      checkDivs[check].querySelector('.badge').textContent = 'Error';
+      checkDivs[check].querySelector('.loading-bar')?.remove();
+      checkDivs[check].querySelector(`#body-${check}`).textContent = err.message;
+    });
+  }
+
+  document.getElementById('btn-verificar').disabled = false;
+}
+
+/* ── PROMPT ── */
+function buildPrompt(m) {
+  const checkDescs = {
+    tributario: 'Estado tributario (deudas, multas, mora, situación en el registro tributario del país)',
+    legal:      'Situación legal y societaria (demandas, juicios, quiebras, estado en registro mercantil)',
+    aml:        'Listas de sanciones: OFAC SDN, ONU, UE, GAFI/FATF, Interpol y listas nacionales AML',
+    pep:        'Vinculación a PEP: directores, socios o representantes que sean funcionarios públicos',
+    reputacional: 'Prensa adversa, noticias negativas, escándalos, corrupción o fraude',
+    ocde:       'Cumplimiento OCDE, GAFI, reguladores sectoriales del país'
+  };
+  const uboBlock = m.ubos.length
+    ? `\nBeneficiarios finales declarados:\n${m.ubos.map(u => `  - ${u.nombre} (${u.participacion}, ${u.nacionalidad})`).join('\n')}` : '';
+  const checks = m.checks.map(c => `- ${CHECK_LABELS[c]}: ${checkDescs[c]}`).join('\n');
+
+  return `Eres experto en compliance AML/KYC para América Latina y España. Realiza una verificación KYC usando búsqueda web para obtener información actualizada.
+
+EMPRESA:
+- Razón social: ${m.razonSocial}
+- País: ${m.country}
+- ${m.idLabel}: ${m.idFiscal || 'No proporcionado'}
+- Sector: ${m.sector || 'No especificado'}
+${m.nombreComercial ? `- Nombre comercial: ${m.nombreComercial}` : ''}
+${m.sitioWeb ? `- Sitio web: ${m.sitioWeb}` : ''}${uboBlock}
+${m.obs ? `- Observaciones: ${m.obs}` : ''}
+
+VERIFICACIONES SOLICITADAS:
+${checks}
+
+Busca información actualizada. Consulta fuentes oficiales del país (SAT en MX, SII en CL, DIAN en CO, SUNAT en PE, SRI en EC, AEAT en ES) y listas internacionales (OFAC, ONU, UE, GAFI).
+
+Responde ÚNICAMENTE con JSON válido sin texto adicional ni backticks markdown:
+{"overall":"ok|warn|risk","overall_summary":"Resumen ejecutivo 1-2 oraciones","checks":{${m.checks.map(c => `"${c}":{"status":"ok|warn|risk|no_data","summary":"Análisis 2-3 oraciones con hallazgos específicos","sources":["fuente1","fuente2"]}`).join(',')}}}`;
+}
+
+/* ── MODAL PDF ── */
+function abrirModalPDF() {
+  document.getElementById('modal-pdf').classList.add('open');
+}
+function cerrarModal() {
+  document.getElementById('modal-pdf').classList.remove('open');
+}
+document.getElementById('modal-pdf').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-pdf')) cerrarModal();
+});
+
+async function generarPDF() {
+  const analista = document.getElementById('pdf-analista').value.trim() || 'Analista Apprecio';
+  const decision = document.getElementById('pdf-decision').value;
+  const notas    = document.getElementById('pdf-notas').value.trim();
+  const apiKey   = getApiKey();
+
+  cerrarModal();
+  showToast('Generando reporte PDF...');
+
+  const payload = JSON.stringify({ meta: kycMeta, results: kycResults, analista, decision, notas });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: `GENERAR_KYC_PDF::${payload}` }]
+      })
+    });
+    const data = await res.json();
+    const txt = data.content?.map(b => b.text||'').join('') || '';
+    showToast(txt.substring(0, 80) || 'PDF en proceso', 'success');
+  } catch (err) {
+    showToast('Error generando PDF: ' + err.message, 'error');
+  }
+}
+
+/* ── HISTORIAL ── */
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (!history.length) {
+    el.innerHTML = `<div class="empty-state"><i class="ti ti-history"></i><h3>Sin verificaciones aún</h3><p>Las verificaciones realizadas aparecerán aquí.</p></div>`;
+    return;
+  }
+  const decisionLabel = { pendiente:'Pendiente', aprobado:'Aprobado', rechazado:'Rechazado', aprobado_condiciones:'Aprobado c/ cond.' };
+  el.innerHTML = history.map((h, i) => {
+    const s = STATUS_MAP[h.overall] || STATUS_MAP['warn'];
+    return `<div class="history-item" onclick="verHistorial(${i})">
+      <div class="history-meta">
+        <div class="history-name">${h.meta.razonSocial}</div>
+        <div class="history-sub">${h.meta.country} · ${h.ts.toLocaleString('es-CL')}</div>
+      </div>
+      <span class="history-badge ${s.badge}">${s.text}</span>
+    </div>`;
+  }).join('');
+}
+
+function verHistorial(idx) {
+  const h = history[idx];
+  kycMeta = h.meta; kycResults = h.results;
+  showView('form');
+  document.getElementById('form-section').style.display    = 'none';
+  document.getElementById('results-section').style.display = '';
+  document.getElementById('btn-pdf').disabled = false;
+
+  const s = STATUS_MAP[h.overall] || STATUS_MAP['warn'];
+  document.getElementById('summary-banner').innerHTML = `
+    <div class="summary-banner ${s.summary_cls}">
+      <i class="ti ${s.summary_icon} summary-icon"></i>
+      <div class="summary-text-block">
+        <div class="summary-title">${s.summary_title} — ${h.meta.razonSocial}</div>
+        <div class="summary-sub">${h.results.overall_summary || ''}</div>
+      </div>
+    </div>`;
+
+  const container = document.getElementById('results-container');
+  container.innerHTML = '';
+  h.meta.checks.forEach(check => {
+    const r = h.results.checks[check];
+    if (!r) return;
+    const st = STATUS_MAP[r.status] || STATUS_MAP['no_data'];
+    const srcHtml = r.sources && r.sources.length
+      ? `<div class="source-tags">${r.sources.map(s => `<span class="source-tag">${s}</span>`).join('')}</div>` : '';
+    const div = document.createElement('div');
+    div.className = 'result-card';
+    div.innerHTML = `
+      <div class="result-header">
+        <div class="result-title"><i class="ti ${CHECK_ICONS[check]}"></i> ${CHECK_LABELS[check]}</div>
+        <span class="badge ${st.badge}">${st.text}</span>
+      </div>
+      <div class="result-body"><p>${r.summary}</p>${srcHtml}</div>`;
+    container.appendChild(div);
+  });
+}
+
+/* ── RESET ── */
+function resetForm() {
+  document.getElementById('form-section').style.display    = '';
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('btn-verificar').disabled = false;
+  kycResults = null; kycMeta = null;
+}
+</script>
+</body>
+</html>
