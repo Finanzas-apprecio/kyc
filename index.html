@@ -762,7 +762,7 @@ async function generarPDF() {
   cerrarModal();
   showToast('Generando reporte PDF...');
 
-  const N8N_WEBHOOK_URL = ''; // <-- misma URL del webhook de n8n
+  const N8N_WEBHOOK_URL = 'https://n8n.openip.cl/webhook/kyc-verificacion'; // <-- misma URL del webhook de n8n
 
   if (!N8N_WEBHOOK_URL) {
     showToast('Configura N8N_WEBHOOK_URL en el HTML para generar PDFs.', 'error');
