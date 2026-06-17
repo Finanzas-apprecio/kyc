@@ -712,7 +712,29 @@ async function iniciarKYC() {
       checkDivs[check].querySelector(`#body-${check}`).textContent = err.message;
     });
   }
-  document.getElementById('btn-verificar').disabled = false;
+  startCooldown();
+}
+
+function startCooldown() {
+  const btn = document.getElementById('btn-verificar');
+  const WAIT = 120; // segundos
+  let remaining = WAIT;
+  btn.disabled = true;
+
+  function tick() {
+    const m = Math.floor(remaining / 60);
+    const s = String(remaining % 60).padStart(2, '0');
+    btn.innerHTML = '<i class="ti ti-clock" aria-hidden="true"></i> Próxima consulta en ' + m + ':' + s;
+    remaining--;
+    if (remaining < 0) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-shield-check" aria-hidden="true"></i> Iniciar verificación KYC';
+      showToast('Listo para una nueva verificación', 'success');
+    } else {
+      setTimeout(tick, 1000);
+    }
+  }
+  tick();
 }
 
 function buildPrompt(m) {
